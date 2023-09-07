@@ -12,6 +12,15 @@ permissions:
   id-token: write
   contents: read
 
+# env variables
+env:
+  ENVIRONMENT_NAME: mywebapp
+  DEVCENTER_NAME: sf-devc-devcenter
+  PROJECT_NAME: Podcast-App
+  ENVIRONMENT_TYPE: dev # Dev, Test, Prod
+  ENVIRONMENT_DEFINITION_NAME: WebApp
+  CATALOG_NAME: sf-dev-podcast-catalog
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -41,11 +50,6 @@ jobs:
     - name: 'Az CLI Deployment Environments'
       id: adedeployment
       run: |
-        ENVIRONMENT_NAME=mywebapp
-        ENVIRONMENT_TYPE=dev # Dev, Test, Prod
-        ENVIRONMENT_DEFINITION_NAME=WebApp
-        CATALOG_NAME=sf-dev-podcast-catalog
-
         az devcenter dev environment create --dev-center-name $DEVCENTER_NAME \
             --project-name $PROJECT_NAME --name $ENVIRONMENT_NAME --environment-type $ENVIRONMENT_TYPE \
             --environment-definition-name $ENVIRONMENT_DEFINITION_NAME --catalog-name $CATALOG_NAME
