@@ -1,0 +1,72 @@
+name: Build and Deploy
+
+on:
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: ./app
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Use Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14.x'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build
+      run: npm run build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Use Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14.x'
+
+    - name: 'Az CLI login'
+      uses: azure/login@v1
+      with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+    # run az cli command
+    - name: 'Az CLI Deployment Environments'
+      id: adedeployment
+      run: |
+        ENVIRONMENT_NAME=mywebapp
+        ENVIRONMENT_TYPE=dev # Dev, Test, Prod
+        ENVIRONMENT_DEFINITION_NAME=WebApp
+        CATALOG_NAME=sf-dev-podcast-catalog
+
+        az devcenter dev environment create --dev-center-name $DEVCENTER_NAME \
+            --project-name $PROJECT_NAME --name $ENVIRONMENT_NAME --environment-type $ENVIRONMENT_TYPE \
+            --environment-definition-name $ENVIRONMENT_DEFINITION_NAME --catalog-name $CATALOG_NAME
+          
+        # Query resourceGroupIo by name
+        RESOURCE_GROUP_ID=$(az devcenter dev environment list --dev-center $DEVCENTER_NAME --project-name $PROJECT_NAME -o tsv --query "[?name=='$ENVIRONMENT_NAME'].resourceGroupId")
+
+        # Get Resource Group Name from ID (name is last part of ID after last /)
+        RESOURCE_GROUP_NAME=$(echo $RESOURCE_GROUP_ID | awk -F'/' '{print $NF}')
+
+        # Get WebApp Name by querying Resource Group
+        echo "webappname=$(az webapp list --resource-group $RESOURCE_GROUP_NAME --query "[].name" -o tsv)" >> "$GITHUB_OUTPUT"
+
+    - name: 'Run Azure webapp deploy action using publish profile credentials'
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{ steps.adedeployment.outputs.webappname}}
