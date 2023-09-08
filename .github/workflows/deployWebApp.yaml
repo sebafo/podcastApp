@@ -66,6 +66,7 @@ jobs:
 
         # Get Resource Group Name from ID (name is last part of ID after last /)
         RESOURCE_GROUP_NAME=$(echo $RESOURCE_GROUP_ID | awk -F'/' '{print $NF}')
+        echo "rgname=$RESOURCE_GROUP_NAME" >> "$GITHUB_OUTPUT"
 
         # Get WebApp Name by querying Resource Group
         echo "webappname=$(az webapp list --resource-group $RESOURCE_GROUP_NAME --query "[].name" -o tsv)" >> "$GITHUB_OUTPUT"
@@ -75,4 +76,4 @@ jobs:
       # with:
       #   app-name: ${{ steps.adedeployment.outputs.webappname}}
       run: |
-        az webapp up --name ${{ steps.adedeployment.outputs.webappname}} --resource-group $RESOURCE_GROUP_NAME --location westeurope --sku Basic --is-linux
+        az webapp up --name ${{steps.adedeployment.outputs.webappname}} --resource-group ${{steps.adedeployment.outputs.rgname}} --location westeurope --sku Basic --is-linux
