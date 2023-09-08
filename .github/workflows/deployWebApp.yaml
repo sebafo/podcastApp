@@ -94,10 +94,8 @@ jobs:
     - name: 'Deploy to Azure Web App'
       id: deploy-to-webapp
       uses: azure/webapps-deploy@v2
-      env:
-        webappname: ${{needs.deploy-infra.outputs.webappname}}
       with:
-        app-name: '${{jobs.deploy-infra.steps.adedeployment.outputs.webappname}}'
+        app-name: '${{needs.deploy-infra.outputs.webappname}}'
         slot-name: 'production'
         package: ./app
 
