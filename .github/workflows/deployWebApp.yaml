@@ -14,7 +14,7 @@ permissions:
 
 # env variables
 env:
-  ENVIRONMENT_NAME: mywebapp
+  ENVIRONMENT_NAME: webapp
   DEVCENTER_NAME: sf-devc-devcenter
   PROJECT_NAME: Podcast-App
   ENVIRONMENT_TYPE: dev # Dev, Test, Prod
@@ -54,12 +54,13 @@ jobs:
     - name: 'AZ CLI Deployment Environments'
       id: adedeployment
       run: |
+        ENVIRONMENT_NAME=$ENVIRONMENT_NAME-$(openssl rand -hex 5)
         az devcenter dev environment create --dev-center-name $DEVCENTER_NAME \
             --project-name $PROJECT_NAME --name $ENVIRONMENT_NAME --environment-type $ENVIRONMENT_TYPE \
             --environment-definition-name $ENVIRONMENT_DEFINITION_NAME --catalog-name $CATALOG_NAME
         # Wait for environment to be created
         sleep 10
-        
+
         # Query resourceGroupIo by name
         RESOURCE_GROUP_ID=$(az devcenter dev environment list --dev-center $DEVCENTER_NAME --project-name $PROJECT_NAME -o tsv --query "[?name=='$ENVIRONMENT_NAME'].resourceGroupId")
 
