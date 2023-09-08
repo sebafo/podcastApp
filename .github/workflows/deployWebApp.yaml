@@ -3,10 +3,6 @@ name: Build and Deploy
 on:
   workflow_dispatch:
 
-defaults:
-  run:
-    working-directory: ./app
-
 # Permissions for Azure login
 permissions:
   id-token: write
@@ -22,7 +18,7 @@ env:
   CATALOG_NAME: sf-dev-podcast-catalog
 
 jobs:
-  build-and-deploy:
+  build-app:
     runs-on: ubuntu-latest
 
     steps:
@@ -31,14 +27,28 @@ jobs:
     - name: Use Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '14.x'
+        node-version: '18.x'
 
     - name: npm install, build, and test
+      working-directory: ./app
       run: |
         npm install
         npm run build --if-present
         npm run test --if-present
 
+    - name: Upload artifact for deployment job
+      uses: actions/upload-artifact@v3
+      with:
+        name: node-app
+        path: ./app
+
+  deploy-infra:
+    runs-on: ubuntu-latest
+
+    outputs:
+      webappname: ${{ steps.adedeployment.outputs.webappname }}
+
+    steps:
     - name: Install AZ CLI DevCenter Extension
       run: |
         az extension add --name devcenter
@@ -71,12 +81,23 @@ jobs:
         # Get WebApp Name by querying Resource Group
         echo "webappname=$(az webapp list --resource-group $RESOURCE_GROUP_NAME --query "[].name" -o tsv)" >> "$GITHUB_OUTPUT"
 
+  deploy:
+    needs: [build-app, deploy-infra]
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Download artifact from build job
+      uses: actions/download-artifact@v3
+      with:
+        name: node-app
+
     - name: 'Deploy to Azure Web App'
       id: deploy-to-webapp
-      if: (always())
       uses: azure/webapps-deploy@v2
+      env:
+        webappname: ${{needs.deploy-infra.outputs.webappname}}
       with:
-        app-name: '${{steps.adedeployment.outputs.webappname}}'
+        app-name: '${{jobs.deploy-infra.steps.adedeployment.outputs.webappname}}'
         slot-name: 'production'
         package: ./app
 
