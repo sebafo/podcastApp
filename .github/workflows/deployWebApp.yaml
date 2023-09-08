@@ -71,6 +71,8 @@ jobs:
         echo "webappname=$(az webapp list --resource-group $RESOURCE_GROUP_NAME --query "[].name" -o tsv)" >> "$GITHUB_OUTPUT"
 
     - name: 'Run Azure webapp deploy action'
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: ${{ steps.adedeployment.outputs.webappname}}
+      # uses: azure/webapps-deploy@v2
+      # with:
+      #   app-name: ${{ steps.adedeployment.outputs.webappname}}
+      run: |
+        az webapp up --name ${{ steps.adedeployment.outputs.webappname}} --resource-group $RESOURCE_GROUP_NAME --location westeurope --sku Basic --is-linux
