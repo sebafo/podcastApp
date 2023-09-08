@@ -39,7 +39,11 @@ jobs:
         npm run build --if-present
         npm run test --if-present
 
-    - name: 'Az CLI login'
+    - name: Install AZ CLI DevCenter Extension
+      run: |
+        az extension add --name devcenter
+
+    - name: 'AZ CLI login'
       uses: azure/login@v1
       with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
@@ -47,13 +51,15 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
     # run az cli command
-    - name: 'Az CLI Deployment Environments'
+    - name: 'AZ CLI Deployment Environments'
       id: adedeployment
       run: |
         az devcenter dev environment create --dev-center-name $DEVCENTER_NAME \
             --project-name $PROJECT_NAME --name $ENVIRONMENT_NAME --environment-type $ENVIRONMENT_TYPE \
             --environment-definition-name $ENVIRONMENT_DEFINITION_NAME --catalog-name $CATALOG_NAME
-          
+        # Wait for environment to be created
+        sleep 10
+        
         # Query resourceGroupIo by name
         RESOURCE_GROUP_ID=$(az devcenter dev environment list --dev-center $DEVCENTER_NAME --project-name $PROJECT_NAME -o tsv --query "[?name=='$ENVIRONMENT_NAME'].resourceGroupId")
 
@@ -63,7 +69,7 @@ jobs:
         # Get WebApp Name by querying Resource Group
         echo "webappname=$(az webapp list --resource-group $RESOURCE_GROUP_NAME --query "[].name" -o tsv)" >> "$GITHUB_OUTPUT"
 
-    - name: 'Run Azure webapp deploy action using publish profile credentials'
+    - name: 'Run Azure webapp deploy action'
       uses: azure/webapps-deploy@v2
       with:
         app-name: ${{ steps.adedeployment.outputs.webappname}}
