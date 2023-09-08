@@ -16,9 +16,6 @@ build/
 jspm_packages/
 bower_components/
 
-# Output of 'npm run build'
-public/
-
 # dotenv environment variables file
 .env
 
