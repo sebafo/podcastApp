@@ -71,9 +71,12 @@ jobs:
         # Get WebApp Name by querying Resource Group
         echo "webappname=$(az webapp list --resource-group $RESOURCE_GROUP_NAME --query "[].name" -o tsv)" >> "$GITHUB_OUTPUT"
 
-    - name: 'Run Azure webapp deploy action'
-      # uses: azure/webapps-deploy@v2
-      # with:
-      #   app-name: ${{ steps.adedeployment.outputs.webappname}}
-      run: |
-        az webapp up --name ${{steps.adedeployment.outputs.webappname}} --resource-group ${{steps.adedeployment.outputs.rgname}}
+    - name: 'Deploy to Azure Web App'
+      id: deploy-to-webapp
+      if: (always())
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: '${{steps.adedeployment.outputs.webappname}}'
+        slot-name: 'production'
+        package: .
+
