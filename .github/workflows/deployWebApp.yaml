@@ -68,8 +68,6 @@ jobs:
         az devcenter dev environment create --dev-center-name $DEVCENTER_NAME \
             --project-name $PROJECT_NAME --name $ENVIRONMENT_NAME --environment-type $ENVIRONMENT_TYPE \
             --environment-definition-name $ENVIRONMENT_DEFINITION_NAME --catalog-name $CATALOG_NAME
-        # Wait for environment to be created
-        sleep 10
 
         # Query resourceGroupIo by name
         RESOURCE_GROUP_ID=$(az devcenter dev environment list --dev-center $DEVCENTER_NAME --project-name $PROJECT_NAME -o tsv --query "[?name=='$ENVIRONMENT_NAME'].resourceGroupId")
