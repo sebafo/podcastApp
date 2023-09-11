@@ -47,6 +47,7 @@ jobs:
 
     outputs:
       webappname: ${{ steps.adedeployment.outputs.webappname }}
+      rgname: ${{ steps.adedeployment.outputs.rgname }}
 
     steps:
     - name: Install AZ CLI DevCenter Extension
