@@ -25,6 +25,7 @@ env:
   CATALOG_NAME: sf-dev-podcast-catalog
 
 jobs:
+  # Build NodeJS App
   build-app:
     runs-on: ubuntu-latest
 
@@ -49,6 +50,7 @@ jobs:
         name: node-app
         path: ./app
 
+  # Deploy Infrastructure
   deploy-infra:
     runs-on: ubuntu-latest
 
@@ -68,7 +70,7 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-    # run az cli command
+    # Run AZ CLI devcenter deployments
     - name: 'AZ CLI Deployment Environments'
       id: adedeployment
       run: |
@@ -87,6 +89,7 @@ jobs:
         # Get WebApp Name by querying Resource Group
         echo "webappname=$(az webapp list --resource-group $RESOURCE_GROUP_NAME --query "[].name" -o tsv)" >> "$GITHUB_OUTPUT"
 
+  # Deploy App to WebApp
   deploy:
     needs: [build-app, deploy-infra]
     runs-on: ubuntu-latest
