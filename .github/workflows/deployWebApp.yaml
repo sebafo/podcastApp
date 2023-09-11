@@ -103,8 +103,8 @@ jobs:
       with:
         inlineScript: |
           publishprofile=$(az webapp deployment list-publishing-profiles \
-            --name '${{needs.deploy-infra.outputs.webappname}}'' \
-            --resource-group '${{needs.deploy-infra.outputs.rgname}}'' \
+            --name '${{needs.deploy-infra.outputs.webappname}}' \
+            --resource-group '${{needs.deploy-infra.outputs.rgname}}' \
             --xml)
           echo "publishprofile=$publishprofile" >> $GITHUB_OUTPUT
 
