@@ -76,6 +76,9 @@ jobs:
         # Create WebApp
         az webapp create --name sf-demo4-webapp --resource-group $RESOURCE_GROUP_NAME --plan sf-demo4-appserviceplan --runtime "node|18-lts"
 
+        # Allow basic auth for publishprofile
+        az resource update --resource-group $RESOURCE_GROUP_NAME --name scm --namespace Microsoft.Web --resource-type basicPublishingCredentialsPolicies --parent sites/sf-demo4-webapp --set properties.allow=true
+
         echo "rgname=$RESOURCE_GROUP_NAME" >> "$GITHUB_OUTPUT"
 
         # Get WebApp Name by querying Resource Group
