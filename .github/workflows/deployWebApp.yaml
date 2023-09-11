@@ -1,0 +1,126 @@
+name: Build and Deploy
+
+on:
+  pull_request:
+    types:
+      - opened
+    branches:
+      - main
+    paths:
+      - 'app/**'
+  workflow_dispatch:
+
+# Permissions for Azure login
+permissions:
+  id-token: write
+  contents: read
+
+# env variables
+env:
+  ENVIRONMENT_NAME: webapp
+  DEVCENTER_NAME: sf-devc-devcenter
+  PROJECT_NAME: Podcast-App
+  ENVIRONMENT_TYPE: dev # Dev, Test, Prod
+  ENVIRONMENT_DEFINITION_NAME: WebApp
+  CATALOG_NAME: sf-dev-podcast-catalog
+
+jobs:
+  build-app:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Use Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+
+    - name: npm install, build, and test
+      working-directory: ./app
+      run: |
+        npm install
+        npm run build --if-present
+        npm run test --if-present
+
+    - name: Upload artifact for deployment job
+      uses: actions/upload-artifact@v3
+      with:
+        name: node-app
+        path: ./app
+
+  deploy-infra:
+    runs-on: ubuntu-latest
+
+    outputs:
+      webappname: ${{ steps.adedeployment.outputs.webappname }}
+      rgname: ${{ steps.adedeployment.outputs.rgname }}
+
+    steps:
+    - name: Install AZ CLI DevCenter Extension
+      run: |
+        az extension add --name devcenter
+
+    - name: 'AZ CLI login'
+      uses: azure/login@v1
+      with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+    # run az cli command
+    - name: 'AZ CLI Deployment Environments'
+      id: adedeployment
+      run: |
+        ENVIRONMENT_NAME=$ENVIRONMENT_NAME-$(openssl rand -hex 5)
+        az devcenter dev environment create --dev-center-name $DEVCENTER_NAME \
+            --project-name $PROJECT_NAME --name $ENVIRONMENT_NAME --environment-type $ENVIRONMENT_TYPE \
+            --environment-definition-name $ENVIRONMENT_DEFINITION_NAME --catalog-name $CATALOG_NAME
+
+        # Query resourceGroupIo by name
+        RESOURCE_GROUP_ID=$(az devcenter dev environment list --dev-center $DEVCENTER_NAME --project-name $PROJECT_NAME -o tsv --query "[?name=='$ENVIRONMENT_NAME'].resourceGroupId")
+
+        # Get Resource Group Name from ID (name is last part of ID after last /)
+        RESOURCE_GROUP_NAME=$(echo $RESOURCE_GROUP_ID | awk -F'/' '{print $NF}')
+        echo "rgname=$RESOURCE_GROUP_NAME" >> "$GITHUB_OUTPUT"
+
+        # Get WebApp Name by querying Resource Group
+        echo "webappname=$(az webapp list --resource-group $RESOURCE_GROUP_NAME --query "[].name" -o tsv)" >> "$GITHUB_OUTPUT"
+
+  deploy:
+    needs: [build-app, deploy-infra]
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Download artifact from build job
+      uses: actions/download-artifact@v3
+      with:
+        name: node-app
+
+    - name: 'AZ CLI login'
+      uses: azure/login@v1
+      with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+    
+    - name: Get app publish profile
+      id: getpublishprofile
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+          publishprofile=$(az webapp deployment list-publishing-profiles \
+            --name '${{needs.deploy-infra.outputs.webappname}}' \
+            --resource-group '${{needs.deploy-infra.outputs.rgname}}' \
+            --xml)
+          echo "publishprofile=$publishprofile" >> $GITHUB_OUTPUT
+
+    - name: 'Deploy to Azure Web App'
+      id: deploy-to-webapp
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: '${{needs.deploy-infra.outputs.webappname}}'
+        slot-name: 'production'
+        publish-profile: '${{steps.getpublishprofile.outputs.publishprofile}}'
+        package: .
+
