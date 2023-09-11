@@ -6,6 +6,8 @@ on:
       - opened
     branches:
       - main
+    paths:
+      - 'app/**'
   workflow_dispatch:
 
 # Permissions for Azure login
