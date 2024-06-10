@@ -4,6 +4,8 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+const port = process.env.PORT || 3000
+
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
@@ -38,8 +40,8 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-app.listen(3000, function () {
-  console.log("Express server listening on port 3000");
-});
+app.listen(port, () => {
+  console.log(`Express listening on http://localhost:${port}`)
+})
 
 module.exports = app;
