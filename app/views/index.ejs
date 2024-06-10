@@ -88,9 +88,9 @@
         <section>
             <h2>Recent Episodes</h2>
             <ul>
-                <li><a href="#">How to run my code in Azure?</a></li>
-                <li><a href="#">Upgrading my AKS cluster</a></li>
-                <li><a href="#">Why I should start using Azure Container Apps</a></li>
+                <% items.forEach(function(item) { %>
+                    <li><a href="<%= item.link %>"><%= item.title %></a></li>
+                <% }); %>
             </ul>
         </section>
     </main>
