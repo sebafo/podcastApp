@@ -29,13 +29,26 @@ app.use(function(req, res, next) {
   next(createError(404));
 });
 
-// error handler
+// catch 203 and forward to error handler
+
+
+
+/**
+ * Error handling middleware for the Express application.
+ * This middleware captures any errors that occur during the request-response cycle
+ * and renders an error page with appropriate details.
+ *
+ * @param {Object} err - The error object containing details about the error.
+ * @param {Object} req - The Express request object.
+ * @param {Object} res - The Express response object.
+ * @param {Function} next - The next middleware function in the stack (not used here).
+ */
 app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
+  // Set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
+  // Render the error page
   res.status(err.status || 500);
   res.render('error');
 });
