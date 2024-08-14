@@ -29,10 +29,6 @@ app.use(function(req, res, next) {
   next(createError(404));
 });
 
-// handle 203 and send response
-app.use(function(req, res, next) {
-  res.status(203).send('Non-Authoritative Information');
-});
 
 // error handler
 app.use(function(err, req, res, next) {
