@@ -127,7 +127,7 @@ jobs:
         publish-profile: '${{steps.getpublishprofile.outputs.publishprofile}}'
         package: .
 
-    - name: Summery
+    - name: Summary
       run: |
         echo "### WebApp Deployed! :rocket:" >> $GITHUB_STEP_SUMMARY
         echo "WebApp: ${{needs.deploy-infra.outputs.webappname}}" >> $GITHUB_STEP_SUMMARY
