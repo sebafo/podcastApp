@@ -17,12 +17,12 @@ permissions:
 
 # env variables
 env:
-  ENVIRONMENT_NAME: webapp
-  DEVCENTER_NAME: sf-devc-devcenter
-  PROJECT_NAME: Podcast-App
-  ENVIRONMENT_TYPE: dev # Dev, Test, Prod
-  ENVIRONMENT_DEFINITION_NAME: WebApp
-  CATALOG_NAME: sf-dev-podcast-catalog
+  ENVIRONMENT_NAME: ${{ vars.ENVIRONMENT_NAME }}
+  DEVCENTER_NAME: ${{ vars.DEVCENTER_NAME }}
+  PROJECT_NAME: ${{ vars.PROJECT_NAME }}
+  ENVIRONMENT_TYPE: ${{ vars.ENVIRONMENT_TYPE}} # Dev, Test, Prod
+  ENVIRONMENT_DEFINITION_NAME: ${{ vars.ENVIRONMENT_DEFINITION_NAME }}
+  CATALOG_NAME: ${{ vars.CATALOG_NAME }}
 
 jobs:
   # Build NodeJS App
