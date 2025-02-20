@@ -2,100 +2,81 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Podcast App Landing Page</title>
+    <title>Podcast Directory</title>
     <style>
         body {
-            background-color: #e6f2ff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 20px;
         }
         h1 {
-            color: #333;
-        }
-        nav ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-        nav li {
-            display: inline-block;
-            margin-right: 20px;
-        }
-        nav a {
-            color: #333;
-            text-decoration: none;
-        }
-        nav a:hover {
-            text-decoration: underline;
-        }
-        section {
+            color: #2c3e50;
+            text-align: center;
             margin-bottom: 40px;
         }
-        h2 {
-            margin-bottom: 20px;
+        .podcast-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
-        article {
-            background-color: #fff;
+        .podcast-card {
+            background: white;
+            border-radius: 12px;
             padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
         }
-        audio {
-            display: block;
-            margin-top: 20px;
+        .podcast-card:hover {
+            transform: translateY(-5px);
         }
-        ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
+        .podcast-title {
+            color: #34495e;
+            font-size: 1.2em;
+            margin: 0 0 10px 0;
         }
-        li {
-            margin-bottom: 10px;
-        }
-        li a {
-            color: #333;
-            text-decoration: none;
-        }
-        li a:hover {
-            text-decoration: underline;
-        }
-        footer {
-            margin-top: 40px;
-            text-align: center;
+        .podcast-description {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            line-height: 1.4;
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Podcast App</h1>
-        <nav>
-            <ul>
-                <li><a href="#">Home</a></li>
-                <li><a href="#">Episodes</a></li>
-                <li><a href="#">About</a></li>
-            </ul>
-        </nav>
-    </header>
-    <main>
-        <section>
-            <h2>Featured Episode</h2>
-            <article>
-                <h3>Platform Engineering - How to build it</h3>
-                <p>Mit Platform Engineering die Produktivität von Entwicklern verbessern.</p>
-                <audio controls>
-                    <source src="" type="audio/mpeg">
-                </audio>
-            </article>
-        </section>
-        <section>
-            <h2>Recent Episodes</h2>
-            <ul>
-                <li><a href="#">How to run my code in Azure?</a></li>
-                <li><a href="#">Upgrading my AKS cluster</a></li>
-                <li><a href="#">Why I should start using Azure Container Apps</a></li>
-            </ul>
-        </section>
-    </main>
-    <footer>
-        <p>&copy; 2023 Podcast App</p>
-    </footer>
+    <h1>Azure Tech Podcasts</h1>
+    
+    <div class="podcast-grid">
+        <div class="podcast-card">
+            <h2 class="podcast-title">Azure Friday</h2>
+            <p class="podcast-description">Scott Hanselman hosts discussions with Azure engineers about various Azure services and features, diving deep into technical implementations.</p>
+        </div>
+
+        <div class="podcast-card">
+            <h2 class="podcast-title">Microsoft Cloud Show</h2>
+            <p class="podcast-description">Weekly podcast covering Microsoft Azure, Office 365, SharePoint, and everything cloud-related in the Microsoft ecosystem.</p>
+        </div>
+
+        <div class="podcast-card">
+            <h2 class="podcast-title">Azure DevOps Podcast</h2>
+            <p class="podcast-description">Focused discussions on DevOps practices in Azure, featuring interviews with industry experts and Microsoft engineers.</p>
+        </div>
+
+        <div class="podcast-card">
+            <h2 class="podcast-title">Azure Security Podcast</h2>
+            <p class="podcast-description">Deep dives into Azure security features, best practices, and discussions with security experts about cloud security.</p>
+        </div>
+
+        <div class="podcast-card">
+            <h2 class="podcast-title">Azure Solutions Architect</h2>
+            <p class="podcast-description">Weekly discussions about Azure architecture patterns, best practices, and real-world implementation stories.</p>
+        </div>
+
+        <div class="podcast-card">
+            <h2 class="podcast-title">Kubernetes on Azure</h2>
+            <p class="podcast-description">Everything about running containerized applications on Azure Kubernetes Service (AKS) and related technologies.</p>
+        </div>
+    </div>
 </body>
 </html>
