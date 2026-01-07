@@ -1,13 +1,13 @@
 name: Build and Deploy
 
 on:
-  pull_request:
-    types:
-      - opened
-    branches:
-      - main
-    paths:
-      - 'app/**'
+  #pull_request:
+  #  types:
+  #    - opened
+  #  branches:
+  #    - main
+  #  paths:
+  #    - 'app/**'
   workflow_dispatch:
 
 # Permissions for Azure login
